@@ -1,0 +1,17 @@
+*~
+.eunit
+deps
+priv
+*.o
+*.beam
+*.plt
+*.log
+*.html
+*.dump
+ebin/
+test/ct_run.*
+test/variables-*
+rel/*node
+.project
+.settings
+*.sublime*

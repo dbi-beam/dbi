@@ -1,0 +1,10 @@
+{application, dbi, [
+    {description, "DataBase Interface for Erlang"},
+    {vsn, "semver"},
+    {registered, []},
+    {applications, [
+        kernel, stdlib, inets, crypto
+    ]},
+    {mod, {dbi_app, []}},
+    {env, []}
+]}.
