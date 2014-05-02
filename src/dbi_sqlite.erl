@@ -33,9 +33,11 @@ do_query(PoolDB, SQL, Params) when is_list(SQL) ->
 do_query(PoolDB, RawSQL, Params) when is_binary(RawSQL) ->
     SQL = resolve(RawSQL),
     {ok, Conn} = dbi_sqlite_server:get_database(PoolDB),
-    Result = case esqlite3:q(SQL, Params, Conn) of
+    Result = case catch esqlite3:q(SQL, Params, Conn) of
         Rows when is_list(Rows) ->
             {ok, length(Rows), Rows};
+        {error, Error} ->
+            {error, Error};
         Error ->
             {error, Error}
     end,
