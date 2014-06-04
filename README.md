@@ -62,9 +62,44 @@ Rows has the format: `[{field1, field2, ..., fieldN}, ...]`
     "UPDATE users SET name = $2 WHERE id = $1", [12, "Mike"]),
 ```
 
-That should works well in pgsql, but not for mysql. For avoid this situations, the best to do is always keep the order of the params.
+That should works well in pgsql, but **NOT for mysql**. For avoid this situations, the best to do is always keep the order of the params.
 
 **IMPORTANT** for mysql and postgresql, when you send an INSERT, UPDATE or DELETE statement, you receive `{ok, Count, []}` where `Count` is the number of affected rows. SQLite has not this feature implemented.
+
+If you want to create a connection to send only commands like INSERT, UPDATE or DELETE but without saturate the database (and run out database connections in the pool) you can use `dbi_delayed`:
+
+```erlang
+{ok, PID} = dbi_delayed:start_link(delay_myconn, myconn),
+dbi_delayed:do_query(delay_myconn, 
+    "INSERT INTO my tab VALUES ($1, $2)", [N1, N2]),
+```
+
+This use only one connection from the pool `myconn`, when the query ends then `dbi_delayed` gets another query to run from the queue. You get statistics about the progress and the queue size:
+
+```erlang
+dbi_delayed:stats(delay_myconn).
+[
+    {size, 0},
+    {query_error, 0},
+    {query_ok, 1}
+]
+```
+
+The delayed can be added to the configuration:
+
+```erlang
+{dbi, [
+    {mydatabase, [
+        {type, mysql},
+        {host, "localhost"},
+        {user, "root"},
+        {pass, "root"},
+        {database, "mydatabase"},
+        {poolsize, 10},
+        {delayed, delay_myconn}
+    ]}
+]}
+```
 
 Enjoy!
 

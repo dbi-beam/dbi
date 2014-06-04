@@ -10,7 +10,10 @@
 -export([init/1]).
 
 %% Helper macro for declaring children of supervisor
--define(CHILD(I, Type), {I, {I, start_link, []}, permanent, 5000, Type, [I]}).
+-define(CHILD(I, A), {I, {I, start_link, A}, permanent, 5000, worker, [I]}).
+-define(CHILD_DELAYED(I, C), {I, 
+    {dbi_delayed, start_link, [I, C]}, 
+    transient, 5000, worker, [dbi_delayed]}).
 
 %% ===================================================================
 %% Application callbacks
@@ -31,6 +34,12 @@ start(_StartType, _StartArgs) ->
             DBName = proplists:get_value(database, DBConf),
             Poolsize = proplists:get_value(poolsize, DBConf),
             Module:init(Host, Port, User, Pass, DBName, PoolName, Poolsize, DBConf),
+            case proplists:get_value(delayed, DBConf) of
+                undefined -> ok;
+                DelayName ->
+                    ChildSpec = ?CHILD_DELAYED(DelayName, PoolName),
+                    supervisor:start_child(?MODULE, ChildSpec)
+            end,
             ordsets:add_element(Module, Set)
     end, ordsets:new(), Conf),
     [ M:run() || M <- Modules ],
@@ -45,5 +54,5 @@ stop(_State) ->
 
 init([]) ->
     {ok, { {one_for_one, 5, 10}, [
-        ?CHILD(dbi_sqlite_server, worker)
+        ?CHILD(dbi_sqlite_server, [])
     ]} }.
