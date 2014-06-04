@@ -36,7 +36,7 @@ do_query(PoolDB, SQL, Params) when is_list(SQL) ->
     do_query(PoolDB, list_to_binary(SQL), Params);
 
 do_query(PoolDB, RawSQL, Params) when is_binary(RawSQL) ->
-    SQL = resolve(RawSQL),
+    SQL = dbi_utils:resolve(RawSQL),
     Result = case emysql:execute(PoolDB, SQL, Params) of
         #result_packet{rows=Rows} ->
             {ok, length(Rows), [ list_to_tuple(Row) || Row <- Rows ]};
@@ -52,26 +52,3 @@ do_query(PoolDB, RawSQL, Params) when is_binary(RawSQL) ->
 
 default(undefined, Default) -> Default;
 default(Value, _Default) -> Value.
-
-resolve(SQL) ->
-    resolve(SQL, <<>>).
-
-
-resolve(<<>>, SQL) ->
-    SQL;
-
-resolve(<<"$$",Rest/binary>>, SQL) ->
-    resolve(Rest, <<SQL/binary, "$">>);
-
-resolve(<<"$",A:1/binary,Rest/binary>>, SQL) when A >= $0 andalso A =< $9 ->
-    resolve(drop_numbers(Rest), <<SQL/binary, "?">>);
-
-resolve(<<C:1/binary,Rest/binary>>, SQL) ->
-    resolve(Rest, <<SQL/binary, C/binary>>).
-
-
-drop_numbers(<<A:1/binary,Rest/binary>>) when A >= $0 andalso A =< $9 ->
-    drop_numbers(Rest);
-
-drop_numbers(Rest) ->
-    Rest.
