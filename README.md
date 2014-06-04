@@ -53,6 +53,8 @@ Or with params:
     "SELECT * FROM users WHERE id = $1", [12]),
 ```
 
+Rows has the format: `[{field1, field2, ..., fieldN}, ...]`
+
 **IMPORTANT** the use of $1..$100 in the query is extracted from pgsql, in mysql is converted to the `?` syntax so, if you write this query:
 
 ```erlang
