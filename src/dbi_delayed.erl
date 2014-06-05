@@ -97,9 +97,9 @@ worker(Ref) ->
         timer:sleep(?WAIT_FOR_QUERIES),
         worker(Ref);
     {value, {Conn, Query, Args}} ->
-        case dbi:do_query(Conn, Query, Args) of
+        case catch dbi:do_query(Conn, Query, Args) of
             {ok, _, _} -> gen_server:cast(Ref, {result, ok});
-            {error, _} -> gen_server:cast(Ref, {result, error})
+            _ -> gen_server:cast(Ref, {result, error})
         end,
         worker(Ref)
     end.
