@@ -34,7 +34,7 @@ start_link(Ref, Conn) ->
     gen_server:start_link({local, Ref}, ?MODULE, [Conn], []).
 
 do_query(Ref, Query, Args) ->
-    gen_server:cast(Ref, {query, Query, Args}).
+    gen_server:cast(Ref, {'query', Query, Args}).
 
 do_query(Ref, Query) ->
     do_query(Ref, Query, []).
@@ -71,7 +71,7 @@ handle_cast({result, ok}, #state{query_ok=QOK}=State) ->
 handle_cast({result, error}, #state{query_errors=QERR}=State) ->
     {noreply, State#state{query_errors=QERR+1}};
 
-handle_cast({query, Query, Args}, #state{queue=Queue, conn=Conn}=State) ->
+handle_cast({'query', Query, Args}, #state{queue=Queue, conn=Conn}=State) ->
     NewQueue = queue:in({Conn, Query, Args}, Queue),
     {noreply, State#state{queue=NewQueue}};
 
