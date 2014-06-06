@@ -40,6 +40,8 @@ do_query(PoolDB, RawSQL, Params) when is_binary(RawSQL) ->
     Result = case emysql:execute(PoolDB, SQL, Params) of
         #result_packet{rows=Rows} ->
             {ok, length(Rows), [ list_to_tuple(Row) || Row <- Rows ]};
+        #ok_packet{affected_rows=Count, insert_id=ID} when ID =/= undefined ->
+            {ok, Count, [ID]};
         #ok_packet{affected_rows=Count} ->
             {ok, Count, []};
         #error_packet{msg=Error} ->
