@@ -1,11 +1,28 @@
 -module(dbi).
 
 -export([
+    start/0,
     do_query/2,
     do_query/3,
     connect/9,
     connect/7
 ]).
+
+-spec start(App::atom()) -> ok.
+
+start(App) ->
+    case application:start(App) of
+        {error, {already_started, App}} -> ok;
+        {error, {not_started, DepApp}} ->
+            start(DepApp),
+            start(App);
+        Other -> Other
+    end.
+
+-spec start() -> ok.
+
+start() ->
+    start(dbi).
 
 -spec do_query(Pool::atom(), Query::binary() | string()) ->
     {error, Reason::atom()} | {ok, Count::integer(), Rows::[term()]}.
