@@ -55,16 +55,14 @@ Or with params:
 
 Rows has the format: `[{field1, field2, ..., fieldN}, ...]`
 
-**IMPORTANT** the use of $1..$100 in the query is extracted from pgsql, in mysql is converted to the `?` syntax so, if you write this query:
+**IMPORTANT** the use of $1..$100 in the query is extracted from pgsql, in mysql and sqlite is converted to the `?` syntax so, if you write this query:
 
 ```erlang
 {ok, Count, Rows} = dbi:do_query(mydatabase, 
     "UPDATE users SET name = $2 WHERE id = $1", [12, "Mike"]),
 ```
 
-That should works well in pgsql, but **NOT for mysql**. For avoid this situations, the best to do is always keep the order of the params.
-
-**IMPORTANT** for mysql and postgresql, when you send an INSERT, UPDATE or DELETE statement, you receive `{ok, Count, []}` where `Count` is the number of affected rows. SQLite has not this feature implemented.
+That should works well in pgsql, but **NOT for mysql and NOT for sqlite**. For avoid this situations, the best to do is always keep the order of the params.
 
 If you want to create a connection to send only commands like INSERT, UPDATE or DELETE but without saturate the database (and run out database connections in the pool) you can use `dbi_delayed`:
 

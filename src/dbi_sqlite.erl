@@ -33,15 +33,26 @@ do_query(PoolDB, SQL, Params) when is_list(SQL) ->
 do_query(PoolDB, RawSQL, Params) when is_binary(RawSQL) ->
     SQL = dbi_utils:resolve(RawSQL),
     {ok, Conn} = dbi_sqlite_server:get_database(PoolDB),
-    Result = case catch esqlite3:q(SQL, Params, Conn) of
+    case dbi_utils:sql_type(SQL) of
+    dql ->
+        case catch esqlite3:q(SQL, Params, Conn) of
         Rows when is_list(Rows) ->
             {ok, length(Rows), Rows};
         {error, Error} ->
             {error, Error};
-        Error ->
+        {'EXIT', Error} ->
             {error, Error}
-    end,
-    Result.
+        end;
+    dml ->
+        case catch esqlite3:exec(SQL, Params, Conn) of
+        {ok, AffectedRows} ->
+            {ok, AffectedRows, []};
+        {error, Error} ->
+            {error, Error};
+        {'EXIT', Error} ->
+            {error, Error}
+        end
+    end.
 
 %%-----------------------------------------------------------------------------
 %% Internal functions
