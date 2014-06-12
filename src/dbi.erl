@@ -56,7 +56,8 @@ connect(Type, Host, Port, User, Pass, Database, Poolname, Poolsize, Extra) ->
         {database, Database}, {poolsize, Poolsize} | Extra
     ],
     application:set_env(dbi, Poolname, DBConf),
-    Module:init(Host, Port, User, Pass, Database, Poolname, Poolsize, Extra).
+    Module:init(Host, Port, User, Pass, Database, Poolname, Poolsize, Extra),
+    Module:run().
 
 -spec connect( Type::atom(),
     Host :: string(), Port :: integer(), User :: string(),
