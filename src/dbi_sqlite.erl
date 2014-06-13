@@ -3,6 +3,7 @@
 -export([
     init/8,
     run/0,
+    terminate/1,
     do_query/3
 ]).
 
@@ -19,6 +20,13 @@ init(_Host, _Port, _User, _Pass, Database, Poolname, _Poolsize, _Extra) ->
 
 run() ->
     ok = application:start(esqlite),
+    ok.
+
+-spec terminate(Poolname :: atom()) -> ok.
+
+terminate(Poolname) ->
+    dbi_sqlite_server:close_database(Poolname),
+    application:stop(esqlite),
     ok.
 
 -spec do_query(

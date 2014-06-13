@@ -3,6 +3,7 @@
 -export([
     init/8,
     run/0,
+    terminate/1,
     do_query/3
 ]).
 
@@ -24,6 +25,11 @@ init(Host, OPort, User, Pass, Database, Poolname, OPoolsize, Extra) ->
 -spec run() -> ok.
 
 run() ->
+    ok.
+
+-spec terminate(Poolname :: atom()) -> ok.
+
+terminate(_Poolname) ->
     ok.
 
 -spec do_query(

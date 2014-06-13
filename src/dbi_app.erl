@@ -40,12 +40,18 @@ start(_StartType, _StartArgs) ->
                     ChildSpec = ?CHILD_DELAYED(DelayName, PoolName),
                     supervisor:start_child(?MODULE, ChildSpec)
             end,
-            ordsets:add_element(Module, Set)
+            ordsets:add_element({Module,PoolName}, Set)
     end, ordsets:new(), Conf),
-    [ M:run() || M <- Modules ],
-    {ok, PID}.
+    [ M:run() || {M,_} <- Modules ],
+    {ok, PID, Modules}.
 
-stop(_State) ->
+stop(Modules) ->
+    Ends = fun({Module,PoolName}) ->
+        spawn(fun() ->
+            Module:terminate(PoolName)
+        end)
+    end,
+    [ Ends(M) || M <- Modules ],
     ok.
 
 %% ===================================================================

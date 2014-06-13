@@ -3,6 +3,7 @@
 -export([
     init/8,
     run/0,
+    terminate/1,
     do_query/3
 ]).
 
@@ -31,6 +32,13 @@ init(Host, Port, User, Pass, Database, Poolname, Poolsize, Extra) ->
 run() ->
     ok = application:start(epgsql),
     ok = application:start(epgsql_pool),
+    ok.
+
+-spec terminate(Poolname :: atom()) -> ok.
+
+terminate(_Poolname) ->
+    application:stop(epgsql_pool),
+    application:stop(epgsql),
     ok.
 
 -spec do_query(
