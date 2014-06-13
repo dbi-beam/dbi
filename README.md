@@ -3,7 +3,7 @@ DBI for Erlang
 
 Database Interface for Erlang. This is an abstract implementation to use the most common database libraries ([emysql][1], [epgsql_pool][2] and [epgsql][3], [esqlite][4], and others you want) to use with standard SQL in your programs and don't worry about if you need to change between the main databases in the market.
 
-== Install (rebar)
+### Install (rebar)
 
 To use it, with rebar, you only need to add the dependency to the rebar.config file:
 
@@ -13,7 +13,7 @@ To use it, with rebar, you only need to add the dependency to the rebar.config f
 ]}
 ```
 
-== Configuration
+### Configuration
 
 The configuration is made in the configuration file (`sys.config` or `app.config`) so, you can add a new block for config the database connection as follow:
 
@@ -44,7 +44,7 @@ The configuration is made in the configuration file (`sys.config` or `app.config
 
 The available types in this moment are: `mysql`, `pgsql` and `sqlite`.
 
-=== Using DBI
+### Using DBI
 
 To do a query:
 
@@ -70,7 +70,7 @@ Rows has the format: `[{field1, field2, ..., fieldN}, ...]`
 
 That should works well in pgsql, but **NOT for mysql and NOT for sqlite**. For avoid this situations, the best to do is always keep the order of the params.
 
-=== Delayed or Queued queries
+### Delayed or Queued queries
 
 If you want to create a connection to send only commands like INSERT, UPDATE or DELETE but without saturate the database (and run out database connections in the pool) you can use `dbi_delayed`:
 
