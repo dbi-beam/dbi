@@ -69,7 +69,7 @@ Rows has the format: `[{field1, field2, ..., fieldN}, ...]`
     "UPDATE users SET name = $2 WHERE id = $1", [12, "Mike"]),
 ```
 
-That should works well in pgsql, but **NOT for mysql and NOT for sqlite**. For avoid this situations, the best to do is always keep the order of the params.
+That should works well in pgsql, but **NOT for mysql and NOT for sqlite**. For avoid this situations, the best to do is **always keep the order of the params**.
 
 ### Delayed or Queued queries
 
@@ -106,6 +106,39 @@ The delayed can be added to the configuration:
         {delayed, delay_myconn}
     ]}
 ]}
+```
+
+### Cache queries
+
+Another thing you can do is use a cache for SQL queries. The cache store the SQL as `key` and the result as `value` and keep the values for the time you specify in the configuration file:
+
+```erlang
+{dbi, [
+    {mydatabase, [
+        {type, mysql},
+        {host, "localhost"},
+        {user, "root"},
+        {pass, "root"},
+        {database, "mydatabase"},
+        {poolsize, 10},
+        {cache, 5}
+    ]}
+]}
+```
+
+The cache param is in seconds. The ideal time to keep the cache values depends on the size of your tables, the data to store in the cache and how frequent are the changes in that data. For avoid flood and other issues due to fast queries or a lot of queries in little time you can use 5 or 10 seconds. To store the information about constants or other data without frequent changes you can use 3600 (one hour) or more time.
+
+To use the cache you should to use the following function from `dbi_cache`:
+
+```erlang
+dbi_cache:do_query(mydatabase, "SELECT items FROM table"),
+```
+
+You can use `do_query/2` or `do_query/3` if you want to use params. And if you want to use a specific TTL (time-to-live) for your query, you can use `do_query/4`:
+
+```erlang
+dbi_cache:do_query(mydatabase,
+    "SELECT items FROM table", [], 3600),
 ```
 
 Enjoy!
