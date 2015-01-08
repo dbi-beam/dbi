@@ -45,6 +45,27 @@ dbi_delayed_test() ->
     ok = application:stop(dbi),
     ok.
 
+dbi_cache_test() ->
+    application:set_env(dbi, testdb, [
+        {type, sqlite},
+        {database, ":memory:"},
+        {cache, 3}
+    ]),
+    ok = dbi:start(),
+    {ok,0,[]} = dbi:do_query(
+        testdb, 
+        "CREATE TABLE testing ( id int primary key );"),
+    {ok,1,[]} = dbi:do_query(
+        testdb,
+        "INSERT INTO testing(id) VALUES (1)"),
+    {ok,1,[{1}]} = dbi_cache:do_query(testdb, "SELECT * FROM testing"),
+    dbi:do_query(testdb, "UPDATE testing SET id = 2"),
+    {ok,1,[{1}]} = dbi_cache:do_query(testdb, "SELECT * FROM testing"),
+    timer:sleep(3000),
+    {ok,1,[{2}]} = dbi_cache:do_query(testdb, "SELECT * FROM testing"),
+    ok = application:stop(dbi),
+    ok.
+
 dbi_args_test() ->
     application:set_env(dbi, testdb, [
         {type, sqlite},

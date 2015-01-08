@@ -15,6 +15,9 @@
 -define(CHILD_DELAYED(I, C), {I, 
     {dbi_delayed, start_link, [I, C]}, 
     transient, 5000, worker, [dbi_delayed]}).
+-define(CHILD_CACHE(I, C), {I,
+    {cache, start_link, [I, C]},
+    transient, 5000, worker, [cache]}).
 
 %% ===================================================================
 %% Application callbacks
@@ -24,7 +27,8 @@ start(_StartType, _StartArgs) ->
     {ok, PID} = supervisor:start_link({local, ?MODULE}, ?MODULE, []),
     Conf = application:get_all_env(),
     Modules = lists:foldl(fun
-        ({included_applications, []}, Set) -> Set;
+        ({included_applications, []}, Set) ->
+            Set;
         ({PoolName, DBConf}, Set) ->
             Type = proplists:get_value(type, DBConf),
             Module = list_to_atom("dbi_" ++ atom_to_list(Type)),
@@ -36,14 +40,22 @@ start(_StartType, _StartArgs) ->
             Poolsize = proplists:get_value(poolsize, DBConf),
             Module:init(Host, Port, User, Pass, DBName, PoolName, Poolsize, DBConf),
             case proplists:get_value(delayed, DBConf) of
-                undefined -> ok;
-                DelayName ->
-                    ChildSpec = ?CHILD_DELAYED(DelayName, PoolName),
-                    supervisor:start_child(?MODULE, ChildSpec)
+            undefined ->
+                ok;
+            DelayName ->
+                ChildSpecD = ?CHILD_DELAYED(DelayName, PoolName),
+                supervisor:start_child(?MODULE, ChildSpecD)
+            end,
+            case proplists:get_value(cache, DBConf) of
+            undefined ->
+                ok;
+            TTL ->
+                ChildSpecC = ?CHILD_CACHE(PoolName, [{n, 10}, {ttl, TTL}]),
+                supervisor:start_child(?MODULE, ChildSpecC)
             end,
             ordsets:add_element({Module,PoolName}, Set)
     end, ordsets:new(), Conf),
-    [ M:run() || {M,_} <- Modules ],
+    [ M:run() || {M,_} <- ordsets:to_list(Modules) ],
     {ok, PID, Modules}.
 
 stop(Modules) ->
