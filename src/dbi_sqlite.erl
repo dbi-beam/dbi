@@ -1,4 +1,5 @@
 -module(dbi_sqlite).
+-author('manuel@altenwald.com').
 
 -export([
     init/8,

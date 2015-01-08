@@ -1,4 +1,6 @@
 -module(dbi_sqlite_server).
+-author('manuel@altenwald.com').
+
 -behaviour(gen_server).
 
 -export([

@@ -1,4 +1,5 @@
 -module(dbi_utils).
+-author('manuel@altenwald.com').
 
 -export([
     resolve/1,

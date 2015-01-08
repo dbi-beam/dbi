@@ -1,4 +1,5 @@
 -module(dbi_app).
+-author('manuel@altenwald.com').
 
 -behaviour(application).
 -behaviour(supervisor).

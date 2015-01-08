@@ -1,4 +1,6 @@
 -module(dbi_delayed).
+-author('manuel@altenwald.com').
+
 -behaviour(gen_server).
 
 -export([
