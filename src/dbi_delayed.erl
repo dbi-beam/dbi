@@ -20,10 +20,12 @@
     code_change/3
 ]).
 
+-include("dbi.hrl").
+
 -define(WAIT_FOR_QUERIES, 500). % ms
 
 -record(state, {
-    queue = queue:new() :: queue:queue(),
+    queue = queue:new() :: ?QUEUE_TYPE,
     conn :: atom(),
     query_errors = 0 :: non_neg_integer(),
     query_ok = 0 :: non_neg_integer()
