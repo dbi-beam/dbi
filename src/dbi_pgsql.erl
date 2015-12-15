@@ -50,7 +50,6 @@ terminate(_Poolname) ->
 
 do_query(PoolDB, SQL, Params) ->
     {ok, C} = pgsql_pool:get_connection(PoolDB),
-    lager:debug("executing query [~s] with params ~p~n", [SQL, Params]),
     Result = case pgsql:equery(C, SQL, Params) of
         {ok, _Columns, Rows} -> {ok, length(Rows), Rows};
         {ok, Count} -> {ok, Count, []};
