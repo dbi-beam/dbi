@@ -50,7 +50,7 @@ terminate(_Poolname) ->
 
 do_query(PoolDB, SQL, Params) ->
     {ok, C} = pgsql_pool:get_connection(PoolDB),
-    Result = case pgsql:equery(C, SQL, Params) of
+    Result = case epgsql:equery(C, SQL, Params) of
         {ok, _Columns, Rows} -> {ok, length(Rows), Rows};
         {ok, Count} -> {ok, Count, []};
         {ok, Count, _Columns, Rows} -> {ok, Count, Rows};
