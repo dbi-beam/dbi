@@ -43,9 +43,9 @@ terminate(_Poolname) ->
     ok.
 
 -spec do_query(
-    PoolDB :: atom(), 
-    SQL :: binary() | string(), 
-    [Params :: any()]) -> 
+    PoolDB :: atom(),
+    SQL :: binary() | string(),
+    [Params :: any()]) ->
     {ok, integer(), [string() | binary()]} | {error, any()}.
 
 do_query(PoolDB, SQL, Params) ->

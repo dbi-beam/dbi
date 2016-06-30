@@ -3,7 +3,7 @@
     {vsn, "semver"},
     {registered, []},
     {applications, [
-        kernel, stdlib, inets, crypto
+        kernel, stdlib, inets, crypto, public_key, asn1, ssl
     ]},
     {mod, {dbi_app, []}},
     {env, []}
