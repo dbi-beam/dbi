@@ -1,6 +1,8 @@
-# DBI for Erlang
+DBI for Erlang
+==============
 
 [![Build Status](https://api.travis-ci.org/altenwald/dbi.png)](https://travis-ci.org/altenwald/dbi)
+[![License: LGPL 2.1](https://img.shields.io/badge/License-GNU%20Lesser%20General%20Public%20License%20v2.1-blue.svg)](https://raw.githubusercontent.com/altenwald/dbi/master/COPYING)
 
 Database Interface for Erlang. This is an abstract implementation to use the most common database libraries ([emysql][1], [epgsql_pool][2] and [epgsql][3], [esqlite][4], and others you want) to use with standard SQL in your programs and don't worry about if you need to change between the main databases in the market.
 
