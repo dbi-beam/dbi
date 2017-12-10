@@ -27,6 +27,7 @@ start_link(ConnData) ->
     Poolsize :: integer(), Extra :: [term()]) -> ok.
 
 init(Host, Port, User, Pass, Database, Poolname, Poolsize, Extra) ->
+    application:start(p1_mysql),
     MaxOverflow = proplists:get_value(max_overflow, Extra, ?DEFAULT_MAX_OVERFLOW),
     ConnData = [Host, dbi_utils:default(Port, ?DEFAULT_PORT),
                 User, Pass, Database, undefined],

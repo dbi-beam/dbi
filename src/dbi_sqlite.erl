@@ -15,6 +15,7 @@
     Poolsize :: integer(), Extra :: [term()]) -> ok.
 
 init(_Host, _Port, _User, _Pass, Database, Poolname, _Poolsize, _Extra) ->
+    application:start(esqlite),
     dbi_sqlite_server:open_database(Poolname, Database),
     ok.
 

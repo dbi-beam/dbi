@@ -27,6 +27,7 @@ start_link([Host, User, Pass, Opts]) ->
     Poolsize :: integer(), Extra :: [term()]) -> ok.
 
 init(Host, Port, User, Pass, Database, Poolname, Poolsize, Extra) ->
+    application:start(epgsql),
     MaxOverflow = proplists:get_value(max_overflow, Extra, ?DEFAULT_MAX_OVERFLOW),
     DataConn = [Host, User, Pass,
                 [{database, Database},

@@ -6,7 +6,10 @@
         kernel,
         stdlib,
         inets,
-        crypto
+        crypto,
+        public_key,
+        asn1,
+        ssl
     ]},
     {mod, {dbi_app, []}},
     {env, []},
