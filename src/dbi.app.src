@@ -1,10 +1,18 @@
 {application, dbi, [
     {description, "DataBase Interface for Erlang"},
-    {vsn, "semver"},
+    {vsn, git},
     {registered, []},
     {applications, [
-        kernel, stdlib, inets, crypto
+        kernel,
+        stdlib,
+        inets,
+        crypto
     ]},
     {mod, {dbi_app, []}},
-    {env, []}
+    {env, []},
+    {maintainers, ["Manuel Rubio"]},
+    {licenses, ["LGPL 2.1"]},
+    {links, [
+        {"Github", "https://github.com/altenwald/dbi"}
+    ]}
 ]}.

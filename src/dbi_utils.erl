@@ -3,7 +3,8 @@
 
 -export([
     resolve/1,
-    sql_type/1
+    sql_type/1,
+    default/2
 ]).
 
 resolve(SQL) ->
@@ -47,3 +48,7 @@ sql_type(<<S:8,H:8,O:8,W:8," ",_/binary>>) when
     (O =:= $O orelse O =:= $o) andalso
     (W =:= $W orelse W =:= $w) -> dql;
 sql_type(_) -> dml.
+
+
+default(undefined, Default) -> Default;
+default(Value, _Default) -> Value.

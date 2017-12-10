@@ -15,3 +15,5 @@ rel/*node
 .project
 .settings
 *.sublime*
+_build/
+cobertura.xml

@@ -18,7 +18,11 @@
     terminate/2
 ]).
 
--record(state, {databases=dict:new()}).
+-include("dbi.hrl").
+
+-record(state, {
+    databases = dict:new() :: ?DICT_TYPE()
+}).
 
 %%-----------------------------------------------------------------------------
 %% API functions
@@ -74,7 +78,3 @@ code_change(_OldVsn, State, _Extra) ->
 
 terminate(_Reason, _State) ->
     ok.
-
-%%-----------------------------------------------------------------------------
-%% internal functions
-

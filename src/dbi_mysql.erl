@@ -1,31 +1,40 @@
 -module(dbi_mysql).
 -author('manuel@altenwald.com').
 
+-behaviour(dbi).
+
 -export([
+    start_link/1,
     init/8,
-    run/0,
     terminate/1,
     do_query/3
 ]).
 
--include_lib("emysql/include/emysql.hrl").
+-include("dbi.hrl").
+
+-define(DEFAULT_POOLSIZE, 10).
+-define(DEFAULT_MAX_OVERFLOW, 10).
+-define(DEFAULT_PORT, 3306).
+
+-spec start_link([term()]) -> {ok, pid()}.
+
+start_link(ConnData) ->
+    {ok, _} = apply(p1_mysql_conn, start_link, ConnData).
 
 -spec init(
     Host :: string(), Port :: integer(), User :: string(),
     Pass :: string(), Database :: string(), Poolname :: atom(),
     Poolsize :: integer(), Extra :: [term()]) -> ok.
 
-init(Host, OPort, User, Pass, Database, Poolname, OPoolsize, Extra) ->
-    Encoding = proplists:get_value(encoding, Extra, utf8),
-    Port = default(OPort, 3306),
-    Poolsize = default(OPoolsize, 10),
-    emysql:add_pool(Poolname, Poolsize, User, Pass, Host, Port, 
-        Database, Encoding), 
-    ok.
-
--spec run() -> ok.
-
-run() ->
+init(Host, Port, User, Pass, Database, Poolname, Poolsize, Extra) ->
+    MaxOverflow = proplists:get_value(max_overflow, Extra, ?DEFAULT_MAX_OVERFLOW),
+    ConnData = [Host, dbi_utils:default(Port, ?DEFAULT_PORT),
+                User, Pass, Database, undefined],
+    PoolArgs = [{name, {local, Poolname}}, {worker_module, ?MODULE},
+                {size, dbi_utils:default(Poolsize, ?DEFAULT_POOLSIZE)},
+                {max_overflow, MaxOverflow}],
+    ChildSpec = poolboy:child_spec(Poolname, PoolArgs, ConnData),
+    supervisor:start_child(?DBI_SUP, ChildSpec),
     ok.
 
 -spec terminate(Poolname :: atom()) -> ok.
@@ -34,9 +43,9 @@ terminate(_Poolname) ->
     ok.
 
 -spec do_query(
-    PoolDB :: atom(), 
-    SQL :: binary() | string(), 
-    [Params :: any()]) -> 
+    PoolDB :: atom(),
+    SQL :: binary() | string(),
+    [Params :: any()]) ->
     {ok, integer(), [string() | binary()]} | {error, any()}.
 
 do_query(PoolDB, SQL, Params) when is_list(SQL) ->
@@ -44,20 +53,16 @@ do_query(PoolDB, SQL, Params) when is_list(SQL) ->
 
 do_query(PoolDB, RawSQL, Params) when is_binary(RawSQL) ->
     SQL = dbi_utils:resolve(RawSQL),
-    Result = case emysql:execute(PoolDB, SQL, Params) of
-        #result_packet{rows=Rows} ->
-            {ok, length(Rows), [ list_to_tuple(Row) || Row <- Rows ]};
-        #ok_packet{affected_rows=Count, insert_id=ID} when ID =/= undefined ->
-            {ok, Count, [ID]};
-        #ok_packet{affected_rows=Count} ->
-            {ok, Count, []};
-        #error_packet{msg=Error} ->
-            {error, Error}
-    end,
-    Result.
-
-%%-----------------------------------------------------------------------------
-%% Internal functions
-
-default(undefined, Default) -> Default;
-default(Value, _Default) -> Value.
+    poolboy:transaction(PoolDB, fun(PID) ->
+        case p1_mysql_conn:squery(PID, SQL, self(), Params) of
+            {data, Result} ->
+                Rows = p1_mysql:get_result_rows(Result),
+                {ok, length(Rows), [ list_to_tuple(Row) || Row <- Rows ]};
+            {updated, Result} ->
+                Count = p1_mysql:get_result_affected_rows(Result),
+                {ok, Count, []};
+            {error, Result} ->
+                Error = p1_mysql:get_result_reason(Result),
+                {error, Error}
+        end
+    end).

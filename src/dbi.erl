@@ -9,6 +9,16 @@
     connect/7
 ]).
 
+-callback init(Host :: string(), Port :: integer(), User :: string(),
+               Pass :: string(), Database :: string(), Poolname :: atom(),
+               Poolsize :: integer(), Extra :: [term()]) -> ok.
+
+-callback do_query(PoolDB :: atom(), SQL :: binary() | string(),
+                   [Params :: any()]) ->
+          {ok, integer(), [string() | binary()]} | {error, any()}.
+
+-callback terminate(Poolname :: atom()) -> ok.
+
 -spec start(App::atom()) -> ok.
 
 start(App) ->

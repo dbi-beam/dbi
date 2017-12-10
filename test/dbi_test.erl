@@ -10,7 +10,7 @@ dbi_basic_test() ->
     ]),
     ok = dbi:start(),
     {ok,0,[]} = dbi:do_query(
-        testdb, 
+        testdb,
         "CREATE TABLE testing ( id int primary key );"),
     {ok,1,[]} = dbi:do_query(
         testdb,
@@ -30,7 +30,7 @@ dbi_delayed_test() ->
     ]),
     ok = dbi:start(),
     ok = dbi_delayed:do_query(
-        mydelayed, 
+        mydelayed,
         "CREATE TABLE testing ( id int primary key );"),
     ok = dbi_delayed:do_query(
         mydelayed,
@@ -38,7 +38,7 @@ dbi_delayed_test() ->
     ok = dbi_delayed:do_query(
         mydelayed,
         "INSERT INTO testing(id) VALUES (2),(3),(4),(5)"),
-    {error,{sqlite_error,"no such table: testing"}} = 
+    {error,{sqlite_error,"no such table: testing"}} =
         dbi:do_query(testdb, "SELECT * FROM testing"),
     timer:sleep(1000),
     {ok,5,_} = dbi:do_query(testdb, "SELECT * FROM testing"),
@@ -53,7 +53,7 @@ dbi_cache_test() ->
     ]),
     ok = dbi:start(),
     {ok,0,[]} = dbi:do_query(
-        testdb, 
+        testdb,
         "CREATE TABLE testing ( id int primary key );"),
     {ok,1,[]} = dbi:do_query(
         testdb,
@@ -73,7 +73,7 @@ dbi_args_test() ->
     ]),
     ok = dbi:start(),
     {ok,0,[]} = dbi:do_query(
-        testdb, 
+        testdb,
         "CREATE TABLE testing ( id int primary key, comment varchar(100) );"),
     lists:foreach(fun(I) ->
         {ok,1,[]} = dbi:do_query(

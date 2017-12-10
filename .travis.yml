@@ -1,6 +1,11 @@
 language: erlang
-script  : "./rebar compile && ./rebar skip_deps=true eunit"
+script: "make compile test"
+install: "sudo pip install codecov"
+after_success: "codecov"
+sudo: true
 otp_release:
-   - R16B01
-   - R16B02
-   - R16B03-1
+- 20.1
+- 19.3
+- 18.3
+- 17.5
+- R16B03-1
