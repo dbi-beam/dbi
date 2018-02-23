@@ -29,10 +29,10 @@ start_link(ConnData) ->
 init(Host, Port, User, Pass, Database, Poolname, Poolsize, Extra) ->
     application:start(p1_mysql),
     MaxOverflow = proplists:get_value(max_overflow, Extra, ?DEFAULT_MAX_OVERFLOW),
-    ConnData = [Host, dbi_utils:default(Port, ?DEFAULT_PORT),
+    ConnData = [Host, dbi_query:default(Port, ?DEFAULT_PORT),
                 User, Pass, Database, undefined],
     PoolArgs = [{name, {local, Poolname}}, {worker_module, ?MODULE},
-                {size, dbi_utils:default(Poolsize, ?DEFAULT_POOLSIZE)},
+                {size, dbi_query:default(Poolsize, ?DEFAULT_POOLSIZE)},
                 {max_overflow, MaxOverflow}],
     ChildSpec = poolboy:child_spec(Poolname, PoolArgs, ConnData),
     supervisor:start_child(?DBI_SUP, ChildSpec),
@@ -53,7 +53,7 @@ do_query(PoolDB, SQL, Params) when is_list(SQL) ->
     do_query(PoolDB, list_to_binary(SQL), Params);
 
 do_query(PoolDB, RawSQL, Params) when is_binary(RawSQL) ->
-    SQL = dbi_utils:resolve(RawSQL),
+    SQL = dbi_query:resolve(RawSQL),
     poolboy:transaction(PoolDB, fun(PID) ->
         case p1_mysql_conn:squery(PID, SQL, self(), Params) of
             {data, Result} ->
