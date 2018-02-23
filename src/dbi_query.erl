@@ -1,4 +1,4 @@
--module(dbi_utils).
+-module(dbi_query).
 -author('manuel@altenwald.com').
 
 -export([
