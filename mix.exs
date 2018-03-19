@@ -39,11 +39,12 @@ defmodule DBI.Mixfile do
      {:p1_mysql, "~> 1.0.4"},
      {:esqlite, "~> 0.2.3"},
      {:cache, "~> 2.2.0"},
-     {:poolboy, "~> 1.5.1"}]
+     {:poolboy, "~> 1.5.1"},
+     {:ex_doc, ">= 0.0.0", only: :dev}]
   end
 
   defp package do
-    [files: ["lib", "mix.exs", "README*", "LICENSE*"],
+    [files: ["lib", "src", "rebar.*", "include", "mix.exs", "README*", "COPYING*"],
      maintainers: ["Manuel Rubio"],
      licenses: ["LGPL 2.1"],
      links: %{"GitHub" => "https://github.com/altenwald/dbi"}]
