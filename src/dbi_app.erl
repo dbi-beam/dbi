@@ -79,6 +79,7 @@ maybe_cache(PoolName, DBConf) ->
         undefined ->
             ok;
         TTL ->
-            ChildSpecC = ?CHILD_CACHE(PoolName, [{n, 10}, {ttl, TTL}]),
+            CachePool = dbi_cache:cache_name(PoolName),
+            ChildSpecC = ?CHILD_CACHE(CachePool, [{n, 10}, {ttl, TTL}]),
             supervisor:start_child(?MODULE, ChildSpecC)
     end.
