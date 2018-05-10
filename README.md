@@ -14,7 +14,7 @@ To use it, with rebar, you only need to add the dependency to the rebar.config f
 
 ```erlang
 {deps, [
-    {dbi, "0.3.1"}
+    {dbi, "0.3.2"}
 ]}
 ```
 
@@ -23,7 +23,7 @@ To use it, with rebar, you only need to add the dependency to the rebar.config f
 To use it, with mix, you only need to add the dependency to the mix.exs file:
 
 ```elixir
-{:dbi, "~> 0.3.1"}
+{:dbi, "~> 0.3.2"}
 ```
 
 ### Configuration
