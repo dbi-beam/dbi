@@ -6,7 +6,8 @@
 -export([
     init/8,
     terminate/1,
-    do_query/3
+    do_query/3,
+    check_migration/1
 ]).
 
 -spec init(
@@ -57,3 +58,14 @@ do_query(PoolDB, RawSQL, Params) when is_binary(RawSQL) ->
                     {error, Error}
             end
     end.
+
+-spec check_migration(PoolDB :: atom()) ->
+      {ok, integer(), [binary()]}.
+
+check_migration(PoolDB) ->
+    Create = <<"CREATE TABLE IF NOT EXISTS schema_migrations("
+               "id integer primary key autoincrement, "
+               "code varchar, "
+               "filename varchar);">>,
+    {ok, _, _} = do_query(PoolDB, Create, []),
+    ok.

@@ -15,7 +15,13 @@
 
 -callback do_query(PoolDB :: atom(), SQL :: binary() | string(),
                    [Params :: any()]) ->
-          {ok, integer(), [string() | binary()]} | {error, any()}.
+          {ok, integer(), [term()]} | {error, any()}.
+
+%% TODO:
+% -callback transaction(PoolDB :: atom(), function()) -> ok | {error, any()}.
+
+-callback check_migration(PoolDB :: atom()) ->
+          {ok, integer(), [binary()]}.
 
 -callback terminate(Poolname :: atom()) -> ok.
 

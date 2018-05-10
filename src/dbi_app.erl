@@ -63,6 +63,13 @@ module_init(PoolName, DBConf) ->
     DBName = proplists:get_value(database, DBConf),
     Poolsize = proplists:get_value(poolsize, DBConf),
     Module:init(Host, Port, User, Pass, DBName, PoolName, Poolsize, DBConf),
+    case  proplists:get_value(migrations, DBConf, undefined) of
+        undefined ->
+            ok;
+        AppName ->
+            Module:check_migration(PoolName),
+            dbi_migrations:update(PoolName, AppName)
+    end,
     Module.
 
 maybe_delayed(PoolName, DBConf) ->

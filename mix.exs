@@ -24,7 +24,10 @@ defmodule DBI.Mixfile do
                  cache: 3],
        testdb3: [type: :sqlite,
                  database: ':memory:',
-                 delayed: :mydelayed]
+                 delayed: :mydelayed],
+       testdb4: [type: :sqlite,
+                 database: ':memory:',
+                 migrations: :dbi]
       ]
     else
       []
@@ -40,6 +43,7 @@ defmodule DBI.Mixfile do
      {:esqlite, "~> 0.2.3"},
      {:cache, "~> 2.2.0"},
      {:poolboy, "~> 1.5.1"},
+     {:eql, "~> 0.1.2"},
      {:ex_doc, ">= 0.0.0", only: :dev}]
   end
 
@@ -61,8 +65,8 @@ defmodule DBI.Mixfile do
 
   defp retrieve_version_from_git do
     System.cmd("git", ["describe", "--always", "--tags"])
-    |> Tuple.to_list
-    |> List.first
-    |> String.strip
+    |> Tuple.to_list()
+    |> List.first()
+    |> String.trim()
   end
 end

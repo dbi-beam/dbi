@@ -7,7 +7,8 @@
     start_link/1,
     init/8,
     terminate/1,
-    do_query/3
+    do_query/3,
+    check_migration/1
 ]).
 
 -include("dbi.hrl").
@@ -47,7 +48,7 @@ terminate(_Poolname) ->
     PoolDB :: atom(),
     SQL :: binary() | string(),
     [Params :: any()]) ->
-    {ok, integer(), [string() | binary()]} | {error, any()}.
+    {ok, integer(), [term()]} | {error, any()}.
 
 do_query(PoolDB, SQL, Params) when is_list(SQL) ->
     do_query(PoolDB, list_to_binary(SQL), Params);
@@ -67,3 +68,14 @@ do_query(PoolDB, RawSQL, Params) when is_binary(RawSQL) ->
                 {error, Error}
         end
     end).
+
+-spec check_migration(PoolDB :: atom()) ->
+      {ok, integer(), [binary()]}.
+
+check_migration(PoolDB) ->
+    Create = <<"CREATE TABLE IF NOT EXISTS schema_migrations("
+               "id integer primary key auto_increment, "
+               "code varchar(1024), "
+               "filename varchar(1024));">>,
+    {ok, _, _} = do_query(PoolDB, Create, []),
+    ok.

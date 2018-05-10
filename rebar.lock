@@ -1,6 +1,7 @@
 {"1.1.0",
 [{<<"cache">>,{pkg,<<"cache">>,<<"2.2.0">>},0},
  {<<"epgsql">>,{pkg,<<"epgsql">>,<<"3.4.0">>},0},
+ {<<"eql">>,{pkg,<<"eql">>,<<"0.1.2">>},0},
  {<<"esqlite">>,{pkg,<<"esqlite">>,<<"0.2.3">>},0},
  {<<"p1_mysql">>,{pkg,<<"p1_mysql">>,<<"1.0.4">>},0},
  {<<"poolboy">>,{pkg,<<"poolboy">>,<<"1.5.1">>},0}]}.
@@ -8,6 +9,7 @@
 {pkg_hash,[
  {<<"cache">>, <<"3C11DBF4CD8FCD5787C95A5FB2A04038E3729CFCA0386016EEA8C953AB48A5AB">>},
  {<<"epgsql">>, <<"39D473B83D74329A88F8FB1F99AD24C7A2329FD753957C488808CB7C0FC8164E">>},
+ {<<"eql">>, <<"C95D7E9635A914A9C70983129F4D86DC5DA70877F39F01785C274DA35BE45AD4">>},
  {<<"esqlite">>, <<"1A8B60877FDD3D50A8A84B342DB04032C0231CC27ECFF4DDD0D934485D4C0CD5">>},
  {<<"p1_mysql">>, <<"7B9D7957A9D031813A0E6BCEA5A7F5E91B54DB805A92709A445CF75CF934BC1D">>},
  {<<"poolboy">>, <<"6B46163901CFD0A1B43D692657ED9D7E599853B3B21B95AE5AE0A777CF9B6CA8">>}]}

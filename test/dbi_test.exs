@@ -13,6 +13,17 @@ defmodule SkirnirImapParserTest do
     :ok = Application.stop(:dbi)
   end
 
+  test "migrations" do
+    assert :ok == DBI.start()
+    assert {:ok, 1, []} == DBI.do_query(:testdb4,
+                                        "INSERT INTO users(id, name) VALUES (1, 'alice')")
+    assert {:ok, 4, []} == DBI.do_query(:testdb4,
+                                        "INSERT INTO users(id, name) VALUES (2, 'bob'), " <>
+                                        "(3, 'charlie'), (4, 'darcy'), (5, 'elliott')")
+    assert {:ok, 5, _} == DBI.do_query(:testdb4, "SELECT * FROM users")
+    :ok = Application.stop(:dbi)
+  end
+
   test "delayed" do
     assert :ok == DBI.start()
     assert :ok == DBI.Delayed.do_query(:mydelayed,

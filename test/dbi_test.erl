@@ -22,6 +22,24 @@ dbi_basic_test() ->
     ok = application:stop(dbi),
     ok.
 
+dbi_migrations_test() ->
+    application:set_env(dbi, testdb, [
+        {type, sqlite},
+        {database, ":memory:"},
+        {migrations, dbi}
+    ]),
+    ok = dbi:start(),
+    {ok,1,[]} = dbi:do_query(
+        testdb,
+        "INSERT INTO users(id, name) VALUES (1, 'alice')"),
+    {ok,4,[]} = dbi:do_query(
+        testdb,
+        "INSERT INTO users(id, name) VALUES (2, 'bob'), "
+        "(3, 'charlie'), (4, 'darcy'), (5, 'elliott')"),
+    {ok, 5, _} = dbi:do_query(testdb, "SELECT * FROM users"),
+    ok = application:stop(dbi),
+    ok.
+
 dbi_delayed_test() ->
     application:set_env(dbi, testdb, [
         {type, sqlite},

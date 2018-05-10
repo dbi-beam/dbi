@@ -7,7 +7,9 @@
     start_link/1,
     init/8,
     terminate/1,
-    do_query/3
+    do_query/3,
+    check_migration/1,
+    transaction/3
 ]).
 
 -include("dbi.hrl").
@@ -48,14 +50,42 @@ terminate(_Poolname) ->
     PoolDB :: atom(),
     SQL :: binary() | string(),
     [Params :: any()]) ->
-    {ok, integer(), [string() | binary()]} | {error, any()}.
+    {ok, integer(), [term()]} | {error, any()}.
 
-do_query(PoolDB, SQL, Params) ->
+do_query(PID, SQL, Params) when is_pid(PID) ->
+    case epgsql:equery(PID, SQL, Params) of
+        {ok, _Columns, Rows} -> {ok, length(Rows), Rows};
+        {ok, Count} -> {ok, Count, []};
+        {ok, Count, _Columns, Rows} -> {ok, Count, Rows};
+        {error, Error} -> {error, Error}
+    end;
+
+do_query(PoolDB, SQL, Params) when is_atom(PoolDB) ->
     poolboy:transaction(PoolDB, fun(PID) ->
-        case epgsql:equery(PID, SQL, Params) of
-            {ok, _Columns, Rows} -> {ok, length(Rows), Rows};
-            {ok, Count} -> {ok, Count, []};
-            {ok, Count, _Columns, Rows} -> {ok, Count, Rows};
-            {error, Error} -> {error, Error}
-        end
+        do_query(PID, SQL, Params)
     end).
+
+-spec check_migration(PoolDB :: atom()) ->
+      {ok, integer(), [binary()]}.
+
+check_migration(PoolDB) ->
+    Create = <<"CREATE TABLE IF NOT EXISTS schema_migrations("
+               "id serial primary key not null, "
+               "code text, "
+               "filename text);">>,
+    {ok, _, _} = do_query(PoolDB, Create, []),
+    ok.
+
+-spec transaction(PoolDB :: atom(), function(), Opts :: term()) ->
+      {ok, integer(), [term()]} | {error, any()}.
+
+transaction(PoolDB, Fun, Opts) ->
+    poolboy:transaction(PoolDB, fun(PID) ->
+        QTran = fun(C) ->
+            Q = fun(Query, Args) ->
+                do_query(C, Query, Args)
+            end,
+            Fun(Q)
+        end,
+        epgsql:with_transaction(PID, QTran)
+    end, Opts).
