@@ -14,7 +14,7 @@ To use it, with rebar, you only need to add the dependency to the rebar.config f
 
 ```erlang
 {deps, [
-    {dbi, "0.2.0"}
+    {dbi, "0.3.1"}
 ]}
 ```
 
@@ -23,7 +23,7 @@ To use it, with rebar, you only need to add the dependency to the rebar.config f
 To use it, with mix, you only need to add the dependency to the mix.exs file:
 
 ```elixir
-{:dbi, "~> 0.2.0"}
+{:dbi, "~> 0.3.1"}
 ```
 
 ### Configuration
@@ -257,6 +257,38 @@ Elixir:
 DBI.Cache.do_query(:mydatabase,
     "SELECT items FROM table", [], 3600)
 ```
+
+### Migrations
+
+You can add a configuration for each connection to configure migrations for a specific application:
+
+```erlang
+{dbi, [
+    {mydatabase, [
+        {type, mysql},
+        {host, "localhost"},
+        {user, "root"},
+        {pass, "root"},
+        {database, "mydatabase"},
+        {poolsize, 10},
+        {migrations, myapp}
+    ]}
+]},
+```
+
+For your application you'll need to create the path `priv/migrations` and locate there the files. The files must to have the format: `code_description_create.sql`. It's mandatory to have the code (it's recomended an incremental code like 001, 002, and so on) and the suffix `_create`. The extension must to be `sql`.
+
+The content of the file is a plain SQL file with the following format:
+
+```sql
+-- :create_users_table
+CREATE TABLE users (
+    id serial primary key not null,
+    name varchar
+);
+```
+
+The table `schema_migrations` will be created then to store the migrations applied to avoid to apply them twice.
 
 Enjoy!
 
