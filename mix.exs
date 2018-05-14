@@ -7,7 +7,7 @@ defmodule DBI.Mixfile do
      name: "DBI",
      description: "DataBase Interface for Erlang",
      package: package(),
-     source_url: "https://github.com/altenwald/dbi",
+     source_url: "https://github.com/dbi-beam/dbi",
      elixir: "~> 1.3",
      compilers: Mix.compilers,
      build_embedded: Mix.env == :prod,
@@ -17,16 +17,12 @@ defmodule DBI.Mixfile do
 
   def application do
     env = if Mix.env == :test do
-      [testdb1: [type: :sqlite,
-                 database: ':memory:'],
-       testdb2: [type: :sqlite,
-                 database: ':memory:',
+      [testdb1: [type: :dumb],
+       testdb2: [type: :dumb,
                  cache: 3],
-       testdb3: [type: :sqlite,
-                 database: ':memory:',
+       testdb3: [type: :dumb,
                  delayed: :mydelayed],
-       testdb4: [type: :sqlite,
-                 database: ':memory:',
+       testdb4: [type: :dumb,
                  migrations: :dbi]
       ]
     else
@@ -38,20 +34,16 @@ defmodule DBI.Mixfile do
   end
 
   defp deps do
-    [{:epgsql, "~> 3.4.0"},
-     {:p1_mysql, "~> 1.0.4"},
-     {:esqlite, "~> 0.2.3"},
-     {:cache, "~> 2.2.0"},
-     {:poolboy, "~> 1.5.1"},
+    [{:cache, "~> 2.2.0"},
      {:eql, "~> 0.1.2"},
      {:ex_doc, ">= 0.0.0", only: :dev}]
   end
 
   defp package do
-    [files: ["lib", "src", "rebar.*", "include", "mix.exs", "README*", "COPYING*"],
+    [files: ["lib", "src/*.erl", "ebin/*.app", "rebar.*", "include", "mix.exs", "README*", "COPYING*"],
      maintainers: ["Manuel Rubio"],
      licenses: ["LGPL 2.1"],
-     links: %{"GitHub" => "https://github.com/altenwald/dbi"}]
+     links: %{"GitHub" => "https://github.com/dbi-beam/dbi"}]
   end
 
   defp get_version do

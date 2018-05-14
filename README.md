@@ -8,6 +8,8 @@ DBI for Erlang
 
 Database Interface for Erlang and Elixir. This is an abstract implementation to use the most common database libraries ([p1_mysql][1], [epgsql][2] and [esqlite][4], and others you want) to use with standard SQL in your programs and don't worry about if you need to change between the main databases in the market.
 
+**IMPORTANT** Note that you'll need to include one (or several) of the other dependencies in the (DBI-BEAM)(https://github.com/dbi-beam) group to use SQLite, MySQL, PostgreSQL or other database supported.
+
 ### Install (rebar3)
 
 To use it, with rebar, you only need to add the dependency to the rebar.config file:

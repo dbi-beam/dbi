@@ -83,7 +83,7 @@ maybe_delayed(PoolName, DBConf) ->
         undefined ->
             ok;
         DelayName ->
-            ChildSpecD = ?CHILD_DELAYED(DelayName, PoolName),
+            ChildSpecD = child_delayed(DelayName, PoolName),
             supervisor:start_child(?MODULE, ChildSpecD)
     end.
 
@@ -93,6 +93,6 @@ maybe_cache(PoolName, DBConf) ->
             ok;
         TTL ->
             CachePool = dbi_cache:cache_name(PoolName),
-            ChildSpecC = ?CHILD_CACHE(CachePool, [{n, 10}, {ttl, TTL}]),
+            ChildSpecC = child_cache(CachePool, [{n, 10}, {ttl, TTL}]),
             supervisor:start_child(?MODULE, ChildSpecC)
     end.

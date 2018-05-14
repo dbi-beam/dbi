@@ -17,7 +17,7 @@
     {maintainers, ["Manuel Rubio"]},
     {licenses, ["LGPL 2.1"]},
     {links, [
-        {"Github", "https://github.com/altenwald/dbi"}
+        {"Github", "https://github.com/dbi-beam/dbi"}
     ]},
     {exclude_files, ["priv/migrations"]}
 ]}.
