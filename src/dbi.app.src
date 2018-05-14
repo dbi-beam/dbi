@@ -19,5 +19,6 @@
     {links, [
         {"Github", "https://github.com/dbi-beam/dbi"}
     ]},
-    {exclude_files, ["priv/migrations"]}
+    {exclude_files, ["priv/migrations"]},
+    {include_files, ["lib", "mix.exs", "mix.lock"]}
 ]}.
