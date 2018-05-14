@@ -63,7 +63,7 @@ downgrade(PoolName, AppName) ->
                 DropRaw = re:replace(File, "_create.sql$", "_drop.sql"),
                 Drop = iolist_to_binary(DropRaw),
                 rollback_migration(PoolName, BaseDir, {Code, Drop})
-            end, ToApply),
+            end, lists:reverse(ToApply)),
             error_logger:info_msg("~b migration(s) removed.",
                                   [length(ToApply)])
     end.
