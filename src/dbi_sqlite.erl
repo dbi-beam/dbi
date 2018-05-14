@@ -19,6 +19,13 @@
     Poolsize :: integer(), Extra :: [term()]) -> ok.
 
 init(_Host, _Port, _User, _Pass, Database, Poolname, _Poolsize, _Extra) ->
+    case whereis(dbi_sqlite_server) of
+        undefined ->
+            ChildSpec = dbi_app:child(dbi_sqlite_server, []),
+            supervisor:start_child(dbi_app, ChildSpec);
+        PID when is_pid(PID) ->
+            ok
+    end,
     application:start(esqlite),
     dbi_sqlite_server:open_database(Poolname, Database),
     ok.
