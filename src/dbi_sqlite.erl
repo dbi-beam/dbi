@@ -7,7 +7,10 @@
     init/8,
     terminate/1,
     do_query/3,
-    check_migration/1
+    check_migration/1,
+    get_migrations/1,
+    add_migration/3,
+    rem_migration/2
 ]).
 
 -spec init(
@@ -69,3 +72,36 @@ check_migration(PoolDB) ->
                "filename varchar);">>,
     {ok, _, _} = do_query(PoolDB, Create, []),
     ok.
+
+-spec get_migrations(Poolname :: atom()) ->
+      {ok, Count :: integer(), [{binary()}]}.
+
+get_migrations(Poolname) ->
+    SQL = <<"SELECT code, filename "
+            "FROM schema_migrations "
+            "ORDER BY id ASC">>,
+    do_query(Poolname, SQL, []).
+
+-spec add_migration(Poolname :: atom(), Code :: binary(), File :: binary()) ->
+      ok | {error, Reason :: any()}.
+
+add_migration(Poolname, Code, File) ->
+    Insert = <<"INSERT INTO schema_migrations(code, filename) "
+               "VALUES ($1, $2)">>,
+    case do_query(Poolname, Insert, [Code, File]) of
+        {ok, _, _} ->
+            ok;
+        Error ->
+            Error
+    end.
+
+-spec rem_migration(Poolname :: atom(), Code :: binary()) ->
+      ok | {error, Reason :: any()}.
+
+rem_migration(Poolname, Code) ->
+    Delete = <<"DELETE FROM schema_migrations "
+               "WHERE code = $1">>,
+    case do_query(Poolname, Delete, [Code]) of
+        {ok, _, _} -> ok;
+        Error -> Error
+    end.

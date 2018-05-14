@@ -6,10 +6,7 @@
 -define(BASE_PATH, "migrations").
 
 update(PoolName, AppName) ->
-    SQL = <<"SELECT code, filename "
-            "FROM schema_migrations "
-            "ORDER BY id ASC">>,
-    {ok, _Count, Codes} = dbi:do_query(PoolName, SQL, []),
+    {ok, _Count, Codes} = dbi:get_migrations(PoolName),
     error_logger:info_msg("database migrations: ~p", [Codes]),
     Mask = filename:join(?BASE_PATH, "*_create.sql"),
     Wildcard = filename:join(code:priv_dir(AppName), Mask),
@@ -40,16 +37,11 @@ apply_migration(PoolName, BaseDir, {Code, File}) ->
     lists:foreach(fun({_Name, SQL}) ->
         {ok, _, _} = dbi:do_query(PoolName, SQL)
     end, lists:reverse(Queries)),
-    Insert = <<"INSERT INTO schema_migrations(code, filename) "
-               "VALUES ($1, $2)">>,
-    {ok, 1, _} = dbi:do_query(PoolName, Insert, [Code, File]),
+    ok = dbi:add_migration(PoolName, Code, File),
     ok.
 
 downgrade(PoolName, AppName) ->
-    SQL = <<"SELECT code, filename "
-            "FROM schema_migrations "
-            "ORDER BY id DESC">>,
-    {ok, _Count, Codes} = dbi:do_query(PoolName, SQL, []),
+    {ok, _Count, Codes} = dbi:get_migrations(PoolName),
     error_logger:info_msg("database migrations: ~p", [Codes]),
     Mask = filename:join(?BASE_PATH, "*_drop.sql"),
     Wildcard = filename:join(code:priv_dir(AppName), Mask),
@@ -84,7 +76,5 @@ rollback_migration(PoolName, BaseDir, {Code, File}) ->
     lists:foreach(fun({_Name, SQL}) ->
         {ok, _, _} = dbi:do_query(PoolName, SQL)
     end, lists:reverse(Queries)),
-    Insert = <<"DELETE FROM schema_migrations "
-               "WHERE code = $1">>,
-    {ok, 1, _} = dbi:do_query(PoolName, Insert, [Code]),
+    ok = dbi:rem_migration(PoolName, Code),
     ok.

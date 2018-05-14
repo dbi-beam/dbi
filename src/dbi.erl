@@ -3,10 +3,14 @@
 
 -export([
     start/0,
+    get_backend/1,
     do_query/2,
     do_query/3,
     connect/9,
-    connect/7
+    connect/7,
+    get_migrations/1,
+    add_migration/3,
+    rem_migration/2
 ]).
 
 -callback init(Host :: string(), Port :: integer(), User :: string(),
@@ -25,6 +29,15 @@
 
 -callback terminate(Poolname :: atom()) -> ok.
 
+-callback get_migrations(Poolname :: atom()) ->
+          {ok, Count :: integer(), [{binary()}]}.
+
+-callback add_migration(Poolname :: atom(), Code :: binary(), File :: binary()) ->
+          ok | {error, Reason :: any()}.
+
+-callback rem_migration(Poolname :: atom(), Code :: binary()) ->
+          ok | {error, Reason :: any()}.
+
 -spec start(App::atom()) -> ok.
 
 start(App) ->
@@ -35,6 +48,13 @@ start(App) ->
             start(App);
         Other -> Other
     end.
+
+-spec get_backend(Pool::atom()) -> module().
+
+get_backend(Pool) ->
+    {ok, Conf} = application:get_env(dbi, Pool),
+    Type = proplists:get_value(type, Conf),
+    list_to_atom("dbi_" ++ atom_to_list(Type)).
 
 -spec start() -> ok.
 
@@ -51,14 +71,8 @@ do_query(Pool, Query) ->
     {error, Reason::atom()} | {ok, Count::integer(), Rows::[term()]}.
 
 do_query(Pool, Query, Args) ->
-    case application:get_env(dbi, Pool) of
-        {ok, Conf} ->
-            Type = proplists:get_value(type, Conf),
-            Module = list_to_atom("dbi_" ++ atom_to_list(Type)),
-            Module:do_query(Pool, Query, Args);
-        undefined ->
-            {error, enopool}
-    end.
+    Module = get_backend(Pool),
+    Module:do_query(Pool, Query, Args).
 
 -spec connect( Type::atom(),
     Host :: string(), Port :: integer(), User :: string(),
@@ -81,3 +95,24 @@ connect(Type, Host, Port, User, Pass, Database, Poolname, Poolsize, Extra) ->
 
 connect(Type, Host, Port, User, Pass, Database, Poolname) ->
     connect(Type, Host, Port, User, Pass, Database, Poolname, 10, []).
+
+-spec get_migrations(Poolname :: atom()) ->
+      {ok, Count :: integer(), [{binary()}]}.
+
+get_migrations(Poolname) ->
+    Module = get_backend(Poolname),
+    Module:get_migrations(Poolname).
+
+-spec add_migration(Poolname :: atom(), Code :: binary(), File :: binary()) ->
+      ok | {error, Reason :: any()}.
+
+add_migration(Poolname, Code, File) ->
+    Module = get_backend(Poolname),
+    Module:add_migration(Poolname, Code, File).
+
+-spec rem_migration(Poolname :: atom(), Code :: binary()) ->
+      ok | {error, Reason :: any()}.
+
+rem_migration(Poolname, Code) ->
+    Module = get_backend(Poolname),
+    Module:rem_migration(Poolname, Code).
