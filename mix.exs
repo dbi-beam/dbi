@@ -40,7 +40,7 @@ defmodule DBI.Mixfile do
   end
 
   defp package do
-    [files: ["lib", "src/*.erl", "ebin/*.app", "rebar.*", "include", "mix.exs", "README*", "COPYING*"],
+    [files: ["lib", "src", "rebar.*", "include", "mix.exs", "README*", "COPYING*"],
      maintainers: ["Manuel Rubio"],
      licenses: ["LGPL 2.1"],
      links: %{"GitHub" => "https://github.com/dbi-beam/dbi"}]
