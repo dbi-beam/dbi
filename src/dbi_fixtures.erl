@@ -6,7 +6,7 @@
 -ifdef(TEST).
 -include_lib("eunit/include/eunit.hrl").
 -else.
--define(debugFmt(_, _), ok).
+-define(debugFmt(_A, _B), ok).
 -define(assertEqual(A, B), A = B).
 -endif.
 
