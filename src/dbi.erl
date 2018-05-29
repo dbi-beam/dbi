@@ -10,7 +10,8 @@
     connect/7,
     get_migrations/1,
     add_migration/3,
-    rem_migration/2
+    rem_migration/2,
+    update_seq/3
 ]).
 
 -callback init(Host :: string(), Port :: integer(), User :: string(),
@@ -38,7 +39,13 @@
 -callback rem_migration(Poolname :: atom(), Code :: binary()) ->
           ok | {error, Reason :: any()}.
 
+-callback update_seq(Poolname :: atom(), SeqId :: binary(),
+                     SeqNum :: pos_integer()) ->
+          ok | {error, Reason :: any()}.
+
 -spec start(App::atom()) -> ok.
+
+-optional_callbacks([update_seq/3]).
 
 start(App) ->
     case application:start(App) of
@@ -116,3 +123,14 @@ add_migration(Poolname, Code, File) ->
 rem_migration(Poolname, Code) ->
     Module = get_backend(Poolname),
     Module:rem_migration(Poolname, Code).
+
+-spec update_seq(Poolname :: atom(), SeqId :: binary(),
+                 SeqNum :: pos_integer()) ->
+      ok | {error, Reason :: any()}.
+
+update_seq(Poolname, SeqId, SeqNum) ->
+    Module = get_backend(Poolname),
+    case lists:member({update_seq, 2}, Module:module_info(exports)) of
+        true -> Module:update_seq(Poolname, SeqId, SeqNum);
+        false -> {error, notimpl}
+    end.
