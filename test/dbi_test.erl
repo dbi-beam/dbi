@@ -1,5 +1,5 @@
 -module(dbi_test).
--compile([debug_info, export_all]).
+-compile([debug_info]).
 
 -include_lib("eunit/include/eunit.hrl").
 
