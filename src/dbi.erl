@@ -130,7 +130,7 @@ rem_migration(Poolname, Code) ->
 
 update_seq(Poolname, SeqId, SeqNum) ->
     Module = get_backend(Poolname),
-    case lists:member({update_seq, 2}, Module:module_info(exports)) of
+    case lists:member({update_seq, 3}, Module:module_info(exports)) of
         true -> Module:update_seq(Poolname, SeqId, SeqNum);
         false -> {error, notimpl}
     end.
