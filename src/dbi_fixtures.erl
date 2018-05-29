@@ -26,5 +26,5 @@ populate(PoolName, Data) ->
                           ?assertEqual({ok, 1, []},
                                        dbi:do_query(PoolName, Query, Row))
                       end, Rows),
-        ok = dbi:update_seq(PoolName, SeqId + 1)
+        ok = dbi:update_seq(PoolName, <<NameBin/binary, "_id_seq">>, SeqId + 1)
     end, Data).
