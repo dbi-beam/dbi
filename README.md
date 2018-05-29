@@ -292,6 +292,27 @@ CREATE TABLE users (
 
 The table `schema_migrations` will be created then to store the migrations applied to avoid to apply them twice.
 
+### Fixtures
+
+When you're testing your software and using a real database connection you'll need to insert some specific data in a easy way. Fixtures is a mechanism to do it. You only need to format the data in the following way:
+
+```erlang
+Data = [{users,
+         ["id", "name", "surname"],
+         [{1, <<"Manuel">>, <<"Rubio">>},
+          {2, <<"Marga">>, <<"Ortiz">>}]}].
+```
+
+This will auto-generate `INSERT` queries to the table `users` with the name of the columns (id, name, surname) and the columns.
+
+You can run this as:
+
+```erlang
+dbi_fixtures:populate(my_connection, Data)
+```
+
+**IMPORTANT** The only restriction is the first column has to be an ID (numeric one). The system will call to `dbi:update_seq/3` when the data is inserted to update the ID to the last ID inserted.
+
 Enjoy!
 
 [1]: https://github.com/processone/p1_mysql
