@@ -8,7 +8,7 @@ defmodule DBI.Mixfile do
      description: "DataBase Interface for Erlang",
      package: package(),
      source_url: "https://github.com/dbi-beam/dbi",
-     elixir: "~> 1.3",
+     elixir: "~> 1.6",
      compilers: Mix.compilers,
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
