@@ -1,9 +1,11 @@
 defmodule DBI.Mixfile do
   use Mix.Project
 
+  @version "1.1.4"
+
   def project do
     [app: :dbi,
-     version: get_version(),
+     version: @version,
      name: "DBI",
      description: "DataBase Interface for Erlang",
      package: package(),
@@ -44,21 +46,5 @@ defmodule DBI.Mixfile do
      maintainers: ["Manuel Rubio"],
      licenses: ["LGPL 2.1"],
      links: %{"GitHub" => "https://github.com/dbi-beam/dbi"}]
-  end
-
-  defp get_version do
-    retrieve_version_from_git()
-    |> String.split("-")
-    |> case do
-      [tag] -> tag
-      [tag, _num_commits, commit] -> "#{tag}-#{commit}"
-    end
-  end
-
-  defp retrieve_version_from_git do
-    System.cmd("git", ["describe", "--always", "--tags"])
-    |> Tuple.to_list()
-    |> List.first()
-    |> String.trim()
   end
 end
